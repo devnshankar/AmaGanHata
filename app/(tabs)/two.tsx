@@ -1,15 +1,21 @@
-import { YStack, H2, Separator, Theme } from 'tamagui';
-
-import EditScreenInfo from '../../components/edit-screen-info';
+import { useRouter } from 'expo-router';
+import { YStack, H2, Separator, Button } from 'tamagui';
 
 export default function TabTwoScreen() {
+  const router = useRouter();
   return (
-    <Theme name="light">
-      <YStack flex={1} alignItems="center" justifyContent="center">
-        <H2>Tab Two</H2>
-        <Separator />
-        <EditScreenInfo path="app/(tabs)/index.tsx" />
-      </YStack>
-    </Theme>
+    <YStack flex={1} alignItems="center" justifyContent="center">
+      <H2>Tab Two</H2>
+      <Separator />
+      <Button
+        backgroundColor={'limegreen'}
+        color={'white'}
+        elevation={12}
+        onPress={() => {
+          router.push('/loginModal');
+        }}>
+        Log in
+      </Button>
+    </YStack>
   );
 }
