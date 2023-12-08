@@ -5,11 +5,13 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { Platform, useColorScheme } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { TamaguiProvider, Theme } from 'tamagui';
 
 import config from '../tamagui.config';
+
+import { StatusBar } from 'expo-status-bar';
 
 // APOLLO SERVER CONFIGURATION
 const getToken = async () => {
@@ -64,7 +66,6 @@ export default function RootLayout() {
   }, [loaded]);
 
   if (!loaded) return null;
-
   return (
     <ApolloProvider client={client}>
       <TamaguiProvider config={config}>
@@ -78,7 +79,19 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="loginModal"
-                options={{ presentation: 'modal', animation: 'slide_from_bottom' }}
+                options={{ headerShown:false, presentation: 'modal', animation: 'slide_from_bottom' }}
+              />
+              <Stack.Screen
+                name="signupModal"
+                options={{ headerShown:false, presentation: 'modal', animation: 'slide_from_right' }}
+              />
+              <Stack.Screen
+                name="notificationModal"
+                options={{
+                  headerTitle: 'Notifications',
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
               />
             </Stack>
             <Toast />

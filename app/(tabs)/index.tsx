@@ -1,15 +1,36 @@
-import { YStack, H2, Separator, Theme } from 'tamagui';
+import { YStack, H2, Separator, Theme, Button, Input, TextArea } from 'tamagui';
 
-import EditScreenInfo from '../../components/edit-screen-info';
+import { useRouter } from 'expo-router';
+import { useColorScheme } from 'react-native';
+import { dark_active_Button, light_active_Button } from '@tamagui/themes/types/generated-new';
+import { useState } from 'react';
 
-export default function TabOneScreen() {
+export default function HomeTabScreen() {
+  const theme = useColorScheme();
+  const buttonTheme:any = () => {
+    if (theme === 'dark') return 'green';
+    else return 'light_active_button';
+  };
+
+  const router = useRouter();
+  const handlebutton = () => {
+    router.push('/loginModal');
+  };
   return (
-    <Theme name="light">
-      <YStack flex={1} alignItems="center" justifyContent="center">
-        <H2>Tab One</H2>
-        <Separator />
-        <EditScreenInfo path="app/(tabs)/index.tsx" />
-      </YStack>
-    </Theme>
+    <YStack flex={1} alignItems="center" justifyContent="center">
+      <H2>Hometab</H2>
+      <Separator />
+      <Button onPress={handlebutton} theme={buttonTheme()}>
+        Login
+      </Button>
+      <Input inlineImageLeft="search_icon" keyboardType='email-address' placeholder="hari" />
+      <TextArea
+        inlineImageLeft="search_icon"
+        selectionColor={'limegreen'}
+        cursorColor={'limegreen'}
+        theme={'green'}
+        width={400}
+      />
+    </YStack>
   );
 }
