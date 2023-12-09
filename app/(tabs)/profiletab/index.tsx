@@ -1,5 +1,6 @@
 import { useMutation } from '@apollo/client';
-import { Mail, MapPin, Phone, User2 } from '@tamagui/lucide-icons';
+import { FontAwesome, FontAwesome5, Ionicons } from '@expo/vector-icons';
+import { Mail, MapPin, Phone, User2, UserCog2 } from '@tamagui/lucide-icons';
 import { useRouter } from 'expo-router';
 import React from 'react';
 import { StyleSheet, useColorScheme, ActivityIndicator, Image } from 'react-native';
@@ -100,7 +101,7 @@ export default function ProfileScreen() {
           <Text>Loading...</Text>
         </View>
       ) : (
-        <View $sm={{ backgroundColor: 'black' }}>
+        <View $sm={{ backgroundColor: 'gray' }}>
           <View $sm={{ backgroundColor: 'green', alignItems: 'center' }}>
             <Avatar $sm={{ margin: 20 }} elevation={20} circular size="$12">
               <Avatar.Image
@@ -112,14 +113,38 @@ export default function ProfileScreen() {
           </View>
           <View $sm={{ margin: 16 }}>
             <Button theme={buttonTheme()}>{User.firstName ? User.firstName : 'no email'}</Button>
-            <Text color={'$color.gray8Light'}>{User.lastName ? User.lastName : 'no email'}</Text>
-            <Text color={'$color.gray8Light'}>{User.email ? User.email : 'no email'}</Text>
-            <Text color={'$color.gray8Light'}>
+            <Text color="$color.gray8Light">{User.lastName ? User.lastName : 'no email'}</Text>
+            <Text color="$color.gray8Light">{User.email ? User.email : 'no email'}</Text>
+            <Text color="$color.gray8Light">
               {User.phoneNumber ? User.phoneNumber : 'No number'}
             </Text>
-            <Text color={'$color.gray8Light'}>{User.address ? User.address : 'No address'}</Text>
-            <Text color={'$color.gray8Light'}>{User.avatar ? User.avatar : 'No address'}</Text>
+            <Text color="$color.gray8Light">{User.address ? User.address : 'No address'}</Text>
+            <Text color="$color.gray8Light">{User.avatar ? User.avatar : 'No address'}</Text>
           </View>
+          <XStack $sm={{ padding: 16, paddingTop: 0 }}>
+            <YGroup
+              alignSelf="center"
+              bordered
+              width="100%"
+              size="$5"
+              elevate
+              borderColor="limegreen"
+              elevation={12}
+              separator={<Separator borderColor="limegreen" />}>
+              <YGroup.Item>
+                <ListItem
+                  title="Name"
+                  subTitle={
+                    (User.firstName || 'No firstName') + ' ' + (User.lastName || 'No lastName')
+                  }
+                  size="$4"
+                  backgroundColor="green"
+                  pressStyle={{ backgroundColor: 'darkgreen' }}
+                  icon={<FontAwesome5 size={22} name="user" />}
+                />
+              </YGroup.Item>
+            </YGroup>
+          </XStack>
         </View>
       )}
     </ScrollView>
