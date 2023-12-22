@@ -2,12 +2,48 @@ import { gql } from '@apollo/client';
 
 // Mutation for creating a user
 export const CREATE_USER = gql`
-  mutation CreateUser($firstName: String!, $email: String!, $password: String!) {
-    createUser(firstName: $firstName, email: $email, password: $password) {
+  mutation CreateUser(
+    $firstName: String!
+    $lastName: String!
+    $email: String!
+    $password: String!
+  ) {
+    createUser(firstName: $firstName, lastName: $lastName, email: $email, password: $password) {
+      firstName
+      lastName
       email
       id
-      firstName
       token
+    }
+  }
+`;
+
+export const GET_USER = gql`
+  query GetUser($getUserId: ID!) {
+    getUser(id: $getUserId) {
+      id
+      firstName
+      lastName
+      email
+      password
+      salt
+      token
+      phoneNumber
+      address
+      profileImageUrl
+      products {
+        id
+        title
+        description
+        category
+        price
+        instock
+        isPublished
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -21,10 +57,24 @@ export const LOGIN_USER = gql`
       lastName
       phoneNumber
       email
-      password
       profileImageUrl
       address
       token
+      products {
+        id
+        title
+        description
+        category
+        price
+        instock
+        isPublished
+        ownerId
+        productImageUrl
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -51,14 +101,29 @@ export const UPDATE_USER = gql`
       address: $address
       token: $token
     ) {
+      id
       firstName
       lastName
       email
-      password
       phoneNumber
       profileImageUrl
       address
       token
+      products {
+        id
+        title
+        description
+        category
+        price
+        instock
+        isPublished
+        ownerId
+        productImageUrl
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
     }
   }
 `;

@@ -3,11 +3,12 @@ import { useMutation } from '@apollo/client';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
-import { Modal, StyleSheet } from 'react-native';
+import { Modal, StyleSheet, ToastAndroid } from 'react-native';
 import { Button, Input, Text, View } from 'tamagui';
 
 import { CREATE_USER, LOGIN_USER } from '../Graphql/user.operations';
 import { useLoginStore } from '../zustand/store';
+import Toast from 'react-native-toast-message';
 
 // SignupForm component
 const SignupForm = ({ onSubmit }: any) => {
@@ -26,6 +27,7 @@ const SignupForm = ({ onSubmit }: any) => {
     <View $sm={{ ...styles.container, backgroundColor: '$background' }}>
       <Text $sm={styles.title}>Signup</Text>
       <Input
+        autoCapitalize="words"
         placeholder="First Name"
         value={firstName}
         onChangeText={(text) => setFirstName(text)}
@@ -33,6 +35,7 @@ const SignupForm = ({ onSubmit }: any) => {
         placeholderTextColor="gray"
       />
       <Input
+        autoCapitalize="words"
         $sm={{ ...styles.input, backgroundColor: '$background', color: '$color' }}
         placeholderTextColor="gray"
         placeholder="Last Name"
@@ -40,13 +43,16 @@ const SignupForm = ({ onSubmit }: any) => {
         onChangeText={(text) => setLastName(text)}
       />
       <Input
+        autoCapitalize="none"
         $sm={{ ...styles.input, backgroundColor: '$background', color: '$color' }}
         placeholderTextColor="gray"
         placeholder="Email"
+        keyboardType="email-address"
         value={email}
         onChangeText={(text) => setEmail(text)}
       />
       <Input
+        autoCapitalize="none"
         $sm={{ ...styles.input, backgroundColor: '$background', color: '$color' }}
         placeholderTextColor="gray"
         placeholder="Password"
@@ -78,37 +84,74 @@ export default function LoginModalScreen() {
   const [createUser, { loading: createUserLoading, error: createUserError }] =
     useMutation(CREATE_USER);
 
+  function validateEmail(email: any) {
+    return email.includes('@' && '.') && email.length > 0;
+  }
+  function validatePassword(password: any) {
+    return password.length >= 8;
+  }
   const handleLoginSubmit = async (formData: any) => {
     try {
-      const { data: loginUserData } = await loginUser({
-        variables: { email: formData.email, password: formData.password },
-      });
-
-      console.log('User logged in:', loginUserData.loginUser);
-
-      const token = loginUserData.loginUser?.token;
-      if (token) {
-        await SecureStore.setItemAsync('token', token);
-        await setUser(loginUserData.loginUser);
+      if (validateEmail(formData.email)) {
+        const { data: loginUserData } = await loginUser({
+          variables: { email: formData.email, password: formData.password },
+        });
+        const token = loginUserData.loginUser?.token;
+        if (token) {
+          await SecureStore.setItemAsync('token', token);
+          await setUser(loginUserData.loginUser);
+          Toast.show({
+            type: 'success',
+            text1: 'Login Successful',
+            text2: 'User logged in successfully !!!',
+          });
+        }
+        router.push('/(tabs)/');
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Email',
+          text2: 'The email you typed is Invalid please try again',
+        });
       }
-      router.push('/(tabs)/');
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      Toast.show({
+        type: 'error',
+        text1: 'Login Failed',
+        text2: error.message.toString(),
+      });
+      console.log('Error while logging in', error);
     }
   };
   const handleSignupSubmit = async (formData: any) => {
     try {
-      const { data: createUserData } = await createUser({
-        variables: {
-          firstName: formData.firstName,
-          email: formData.email,
-          password: formData.password,
-        },
-      });
-
-      console.log('User created:', createUserData.createUser);
-
-      await handleLoginSubmit(formData);
+      if (validateEmail(formData.email)) {
+        if (validatePassword(formData.password)) {
+          const { data: createUserData } = await createUser({
+            variables: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              password: formData.password,
+            },
+          });
+          console.log('User created:', createUserData.createUser);
+          ToastAndroid.show('User created Successfully !!!', ToastAndroid.BOTTOM);
+          await handleLoginSubmit(formData);
+        } else {
+          Toast.show({
+            type: 'error',
+            text1: 'Insecure Password',
+            text2: 'The password should be at least 8 characters long !!',
+          });
+        }
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Email',
+          text2: 'The email you typed is Invalid please try again',
+        });
+      }
     } catch (error) {
       console.error('Error creating user:', error);
     }

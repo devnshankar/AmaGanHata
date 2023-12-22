@@ -32,6 +32,30 @@ export default function SalesTabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="helpandsupport"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="mode"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="myorders"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          headerShown: false,
+        }}
+      />
     </Tabs>
   );
 }

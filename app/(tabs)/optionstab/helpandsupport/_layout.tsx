@@ -7,7 +7,6 @@ export default function SalesTabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: 'black',
         tabBarStyle: {
           display: 'none',
         },
@@ -15,29 +14,12 @@ export default function SalesTabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Sales',
+          title: 'Help & Support',
           headerLeft: () => (
-            <Pressable onPress={() => {router.back()}}>
-              {({ pressed }) => (
-                <Ionicons
-                  name="arrow-back"
-                  size={28}
-                  color="gray"
-                  style={[styles.headerLeft, { opacity: pressed ? 0.5 : 1 }]}
-                />
-              )}
-            </Pressable>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="myproducts"
-        
-        options={{
-          title: 'My Products',
-          headerShown:false,
-          headerLeft: () => (
-            <Pressable onPress={() => {router.back()}}>
+            <Pressable
+              onPress={() => {
+                router.back();
+              }}>
               {({ pressed }) => (
                 <Ionicons
                   name="arrow-back"

@@ -3,15 +3,15 @@ import { useMutation } from '@apollo/client';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { Button, Input, Text, View } from 'tamagui';
+import { ActivityIndicator, StyleSheet } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { Button, Input, Spinner, Text, View } from 'tamagui';
 
 import { LOGIN_USER } from '../Graphql/user.operations';
-import { useLoginStore } from '../zustand/store';
-import Toast from 'react-native-toast-message';
+import { useLoginStore, useProductStore } from '../zustand/store';
 
 // LoginForm component
-const LoginForm = ({ onSubmit }: any) => {
+const LoginForm = ({ onSubmit, isLoading }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const router = useRouter();
@@ -24,13 +24,18 @@ const LoginForm = ({ onSubmit }: any) => {
     <View $sm={{ ...styles.container, backgroundColor: '$background' }}>
       <Text $sm={styles.title}>Login</Text>
       <Input
+        autoCapitalize="none"
         $sm={{ ...styles.input, backgroundColor: '$background', color: '$color' }}
         placeholder="Email"
         placeholderTextColor="gray"
         value={email}
-        onChangeText={(text) => setEmail(text)}
+        keyboardType="email-address"
+        onChangeText={(text) => {
+          setEmail(text);
+        }}
       />
       <Input
+        autoCapitalize="none"
         $sm={{ ...styles.input, backgroundColor: '$background', color: '$color' }}
         placeholder="Password"
         secureTextEntry
@@ -38,8 +43,14 @@ const LoginForm = ({ onSubmit }: any) => {
         placeholderTextColor="gray"
         onChangeText={(text) => setPassword(text)}
       />
-      <Button size={'$4'} $sm={{ width: '' }} backgroundColor="gray" onPress={handleSubmit}>
-        Login
+      <Button
+        onPress={handleSubmit}
+        fontSize={16}
+        pressStyle={{ backgroundColor: 'gray' }}
+        size="$4"
+        color={'white'}
+        backgroundColor="green">
+        {isLoading ? <ActivityIndicator  color={'white'} style={{paddingRight:13, paddingLeft:13}}/> : 'Login'}
       </Button>
       <Text
         $sm={styles.switchText}
@@ -55,36 +66,55 @@ const LoginForm = ({ onSubmit }: any) => {
 // Main LoginModal component
 export default function LoginModalScreen() {
   const router = useRouter();
-  const { showLogin, setShowLogin, setUser } = useLoginStore();
-
+  const { user, showLogin, setShowLogin, setUser } = useLoginStore();
+  const { setProducts } = useProductStore();
+  const [isLoading, setIsLoading] = useState(false);
   const [loginUser, { loading: loginUserLoading, error: loginError }] = useMutation(LOGIN_USER);
 
+  function validateEmail(email: any) {
+    return email.includes('@' && '.') && email.length > 0;
+  }
   const handleLoginSubmit = async (formData: any) => {
     try {
-      const { data: loginUserData } = await loginUser({
-        variables: { email: formData.email, password: formData.password },
-      });
-      const token = loginUserData.loginUser?.token;
-      if (token) {
-        await SecureStore.setItemAsync('token', token);
-        await setUser(loginUserData.loginUser);
-        Toast.show({
-          type: 'success',
-          text1: 'Login Successful',
-          text2: 'User successfully logged in',
+      setIsLoading(true);
+      if (validateEmail(formData.email)) {
+        const { data: loginUserData } = await loginUser({
+          variables: { email: formData.email, password: formData.password },
         });
+        const token = loginUserData.loginUser?.token;
+        if (token) {
+          await SecureStore.setItemAsync('token', token);
+          // await SecureStore.setItemAsync('User', loginUserData.loginUser);
+          // await SecureStore.setItemAsync('Products', loginUserData.loginUser.products);
+          await setUser(loginUserData.loginUser);
+          await setProducts(loginUserData.loginUser.products);
+          Toast.show({
+            type: 'success',
+            text1: 'Login Successful',
+            text2: 'User logged in successfully !!!',
+          });
+        }
+        router.push('/(tabs)/');
+        setIsLoading(false);
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Email',
+          text2: 'The email you typed is Invalid please try again',
+        });
+        setIsLoading(false);
       }
-      
-      router.push('/(tabs)/');
-    } catch (error) {
+    } catch (error: any) {
       Toast.show({
         type: 'error',
         text1: 'Login Failed',
-        text2: 'There was a problem logging in',
+        text2: error.message.toString(),
       });
+      console.log('Error while logging in', error);
+      setIsLoading(false);
     }
   };
-  return <LoginForm onSubmit={handleLoginSubmit} />;
+  return <LoginForm onSubmit={handleLoginSubmit} isLoading={isLoading}/>;
 }
 
 const styles = StyleSheet.create({
@@ -97,7 +127,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 16,
-    color: '#333',
+    color: 'gray',
   },
   input: {
     height: 40,
@@ -110,6 +140,6 @@ const styles = StyleSheet.create({
   },
   switchText: {
     marginTop: 16,
-    color: 'blue',
+    color: 'green',
   },
 });

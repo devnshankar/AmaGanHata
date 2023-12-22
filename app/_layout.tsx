@@ -5,13 +5,11 @@ import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useEffect } from 'react';
-import { Platform, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { TamaguiProvider, Theme } from 'tamagui';
 
 import config from '../tamagui.config';
-
-import { StatusBar } from 'expo-status-bar';
 
 // APOLLO SERVER CONFIGURATION
 const getToken = async () => {
@@ -79,11 +77,39 @@ export default function RootLayout() {
               />
               <Stack.Screen
                 name="loginModal"
-                options={{ headerShown:false, presentation: 'modal', animation: 'slide_from_bottom' }}
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
               />
               <Stack.Screen
                 name="signupModal"
-                options={{ headerShown:false, presentation: 'modal', animation: 'slide_from_right' }}
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_left',
+                }}
+              />
+              <Stack.Screen
+                name="editProfileModal"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
+              />
+              <Stack.Screen
+                name="logoutAlertModal"
+                options={{ headerShown: false, presentation: 'modal', animation: 'fade' }}
+              />
+              <Stack.Screen
+                name="createProductModal"
+                options={{
+                  headerShown: false,
+                  presentation: 'modal',
+                  animation: 'slide_from_bottom',
+                }}
               />
               <Stack.Screen
                 name="notificationModal"
