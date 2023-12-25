@@ -94,7 +94,7 @@ const SalesTabScreen = () => {
         </View>
       ) : (
         <>
-          <YStack $sm={{ flexDirection: 'column', flex: 1, padding:16 }}>
+          <YStack $sm={{ flexDirection: 'column', flex: 1, padding: 16 }}>
             <View $sm={{ paddingBottom: 0 }}>
               <YGroup
                 alignSelf="center"
@@ -122,7 +122,7 @@ const SalesTabScreen = () => {
               </YGroup>
             </View>
 
-            <YStack elevation={12} $sm={{paddingTop:15}}>
+            <YStack elevation={12} $sm={{ paddingTop: 15 }}>
               <Text
                 $sm={{ padding: 3, paddingTop: 0, fontSize: 16, fontWeight: 'bold' }}
                 color="$color">

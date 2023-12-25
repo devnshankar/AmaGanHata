@@ -32,6 +32,23 @@ export const CREATE_PRODUCT = gql`
     }
   }
 `;
+export const GET_ALL_PRODUCTS = gql`
+  query GetAllProducts {
+    getAllProducts {
+      id
+      ownerId
+      title
+      description
+      category
+      price
+      instock
+      isPublished
+      productImageUrl
+      createdAt
+      updatedAt
+    }
+  }
+`;
 export const DELETE_PRODUCT = gql`
   mutation DeleteProduct($deleteProductId: ID!) {
     deleteProduct(id: $deleteProductId) {

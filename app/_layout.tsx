@@ -1,4 +1,5 @@
 import { createHttpLink, ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
+import { loadErrorMessages, loadDevMessages } from '@apollo/client/dev';
 import { setContext } from '@apollo/client/link/context';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
@@ -11,6 +12,11 @@ import { TamaguiProvider, Theme } from 'tamagui';
 
 import config from '../tamagui.config';
 
+if (__DEV__) {
+  // Adds messages only in a dev environment
+  loadDevMessages();
+  loadErrorMessages();
+}
 // APOLLO SERVER CONFIGURATION
 const getToken = async () => {
   try {

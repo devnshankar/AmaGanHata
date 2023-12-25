@@ -12,7 +12,7 @@ import { CREATE_PRODUCT } from '../Graphql/product.operations'; // Import your p
 
 export default function CreateProductModalScreen() {
   const router = useRouter();
-  const { user, setUser } = useLoginStore();
+  const { user } = useLoginStore();
   const { products, setProducts, addProduct } = useProductStore();
   const [formData, setFormData] = useState({
     ownerId: user?.id,
@@ -61,15 +61,13 @@ export default function CreateProductModalScreen() {
       });
       await refetchUser();
       // await setProducts(userData.getUser.products);
-      await addProduct(createdProductData.createProduct);
+      addProduct(createdProductData.createProduct);
       router.back();
       Toast.show({
         type: 'success',
         text1: 'Product Creation Successful',
         text2: 'Product created successfully !!!',
       });
-      // Close the modal or perform any other necessary actions
-      // onClose();
     } catch (error) {
       console.error('Error creating product:', error);
     }

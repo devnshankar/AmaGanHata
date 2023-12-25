@@ -44,8 +44,10 @@ const OptionsTabScreen = () => {
   const handleLogoutPress = async () => {
     // Remove the token from SecureStore on logout
     await SecureStore.deleteItemAsync('token');
-    await setUser(null);
-    await setProducts(null);
+    await SecureStore.deleteItemAsync('email');
+    await SecureStore.deleteItemAsync('password');
+    setUser(null);
+    setProducts(null);
     console.log('User logged out');
     Toast.show({
       type: 'success',

@@ -1,6 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { Link, Tabs } from 'expo-router';
-import { Pressable, StyleSheet } from 'react-native';
+import { Pressable, StyleSheet, Image } from 'react-native';
+import { Avatar } from 'tamagui';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -18,9 +19,19 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: '',
           tabBarShowLabel: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+          headerLeft: () => (
+            <Avatar
+              circular
+              size="$6"
+              marginLeft={16}
+              $sm={{ margin: -50, overflow: 'hidden', marginLeft: 0, marginRight: -20 }}>
+              <Avatar.Image src={require('../../assets/adaptive-icon.png')} />
+              <Avatar.Fallback bc="transparent" />
+            </Avatar>
+          ),
           headerRight: () => (
             <Link href="/notificationModal" asChild>
               <Pressable>
