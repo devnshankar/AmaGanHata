@@ -28,7 +28,7 @@ const getToken = async () => {
 };
 
 const httpLink = createHttpLink({
-  uri: 'https://one-beagle-gradually.ngrok-free.app/graphql',
+  uri: 'https://superb-mighty-skylark.ngrok-free.app/graphql',
 });
 
 const authLink = setContext(async (_, { headers }) => {

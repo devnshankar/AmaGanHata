@@ -119,6 +119,7 @@ export default function LoginModalScreen() {
             // await SecureStore.setItemAsync('User', loginUserData.loginUser);
             // await SecureStore.setItemAsync('Products', loginUserData.loginUser.products);
             setUser(loginUserData.loginUser);
+            console.log(loginUserData.loginUser.profileImageUrl)
             setProducts(loginUserData.loginUser.products);
             Toast.show({
               type: 'success',

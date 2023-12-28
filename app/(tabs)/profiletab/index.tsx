@@ -2,7 +2,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { Base64 } from 'js-base64';
 import React from 'react';
-import { StyleSheet, useColorScheme, ActivityIndicator } from 'react-native';
+import { StyleSheet, useColorScheme, ActivityIndicator, Image } from 'react-native';
 import {
   Avatar,
   ListItem,
@@ -24,6 +24,7 @@ export default function ProfileScreen() {
 
   const { user, setUser } = useLoginStore();
 
+  //INFO IMAGE DECRYPTION
   let decodedUri = '';
   if (user?.profileImageUrl !== null) {
     decodedUri = Base64.decode(user?.profileImageUrl || '').toString();

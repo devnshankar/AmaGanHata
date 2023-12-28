@@ -23,6 +23,7 @@ const UpdateUserModal = () => {
 
   const handleSaveChanges = async (formData: any) => {
     try {
+      //INFO IMAGE DATA ENCRYPTION
       const base64Image = Base64.encode(formData.profileImageUrl);
       const { data: updateUserData } = await updateUser({
         variables: {
