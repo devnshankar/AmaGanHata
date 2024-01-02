@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 import { TamaguiProvider, Theme } from 'tamagui';
 
 import config from '../tamagui.config';
+import { useLoginStore } from 'zustand/store';
 
 if (__DEV__) {
   // Adds messages only in a dev environment
@@ -47,6 +48,39 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
 });
 
+// typePolicies: {
+//   Querry: {
+//     fields: {
+//       getAllProducts: {
+//         merge(_, incoming, { cache }) {
+//           cache.modify({
+//             fields: {
+//               getAllProducts(existing = []) {
+//                 return [...existing, incoming];
+//               },
+//             },
+//           });
+//         },
+//       },
+//     },
+//   },
+//   Mutation: {
+//     fields: {
+//       getAllProducts: {
+//         merge(_, incoming, { cache }) {
+//           cache.modify({
+//             fields: {
+//               getAllProducts(existing = []) {
+//                 return [...existing, incoming];
+//               },
+//             },
+//           });
+//         },
+//       },
+//     },
+//   },
+// },
+
 // DEFAULT ROOT CONFIGURATION BOILERPLATE
 SplashScreen.preventAutoHideAsync();
 
@@ -58,16 +92,17 @@ export const unstable_settings = {
 export default function RootLayout() {
   const colorscheme: any = useColorScheme() === 'dark' ? DarkTheme : DefaultTheme;
   const colorScheme: any = useColorScheme();
+  const { showLogin } = useLoginStore();
   const [loaded] = useFonts({
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   });
-
+  console.log(showLogin)
   useEffect(() => {
-    if (loaded) {
+    if (loaded && showLogin) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, showLogin]);
 
   if (!loaded) return null;
   return (

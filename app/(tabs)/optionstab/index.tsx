@@ -7,11 +7,13 @@ import Toast from 'react-native-toast-message';
 import { ListItem, Separator, XStack, YGroup, Text, View } from 'tamagui';
 
 // import Colors from '../../../constants/Colors';
-import { useLoginStore, useProductStore } from 'zustand/store';
+import { useFetchedProductStore, useLoginStore, useOrderItemStore, useProductStore } from 'zustand/store';
 
 const OptionsTabScreen = () => {
   const { showLogin, setShowLogin, setUser } = useLoginStore();
   const { setProducts } = useProductStore();
+  const { setOrderItems } = useOrderItemStore();
+    const {fetchedProducts, setFetchedProducts } = useFetchedProductStore();
   const colorScheme = useColorScheme();
   const router = useRouter();
 
@@ -47,7 +49,10 @@ const OptionsTabScreen = () => {
     await SecureStore.deleteItemAsync('email');
     await SecureStore.deleteItemAsync('password');
     setUser(null);
-    setProducts(null);
+    setProducts([]);
+    setOrderItems([]);
+    setFetchedProducts([]);
+
     console.log('User logged out');
     Toast.show({
       type: 'success',
@@ -94,7 +99,7 @@ const OptionsTabScreen = () => {
                   width="100%"
                   size="$5"
                   elevation={10}
-                  borderColor={colorScheme === 'dark' ? '$green7Dark' : 'white'}
+                  borderColor={colorScheme === 'dark' ? '$green7Dark' : 'transparent'}
                   separator={
                     <Separator
                       borderColor={colorScheme === 'dark' ? '$green7Dark' : '$gray5Light'}
@@ -153,7 +158,7 @@ const OptionsTabScreen = () => {
                   width="100%"
                   size="$5"
                   elevation={8}
-                  borderColor={colorScheme === 'dark' ? '$green7Dark' : 'white'}
+                  borderColor={colorScheme === 'dark' ? '$green7Dark' : 'transparent'}
                   separator={
                     <Separator
                       borderColor={colorScheme === 'dark' ? '$green7Dark' : '$gray5Light'}
@@ -265,7 +270,7 @@ export default OptionsTabScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
     flexDirection: 'column',
     justifyContent: 'space-between',
   },

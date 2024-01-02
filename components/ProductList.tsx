@@ -17,19 +17,18 @@ export default function ProductList({
     <XStack $sm={{ marginBottom: 10 }}>
       <YGroup
         alignSelf="center"
-        bordered
         width="100%"
         size="$5"
-        borderRightWidth={1.4}
-        borderColor="$tabItemBorderColor">
+        borderWidth={0.7}
+        borderTopWidth={1.1}
+        borderRightWidth={1.2}
+        borderColor={colorScheme === 'dark' ? '#3a3a3a' : 'transparent'}>
         <YGroup.Item>
           <ListItem
-            borderWidth={0.5}
             onPress={() => {
               console.log(productTitle);
             }}
-            elevation={15}
-            $sm={{ backgroundColor: '$listItemBackgroundColor' }}
+            $sm={{ backgroundColor: '$listItemBackgroundColor' , elevation:15, }}
             pressStyle={{ backgroundColor: '$listItemPressColor' }}
             title={productTitle}
             subTitle={
@@ -69,12 +68,12 @@ export default function ProductList({
             icon={
               <Image
                 borderRadius={5}
-                source={productImage ? productImage : require('../assets/images/product1.jpg')}
+                source={{ uri: productImage }}
                 style={{ width: 90, height: 90 }}
               />
             }
             size="$4"
-            padding={7}
+            padding={6}
             backgroundColor="$listItemBackground"
           />
         </YGroup.Item>

@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { Button, Input, Text, View } from 'tamagui';
 import { useLoginStore, useProductStore } from 'zustand/store';
 
-import { CREATE_PRODUCT } from '../Graphql/product.operations'; // Import your product mutation
+import { CREATE_PRODUCT, GET_ALL_PRODUCTS } from '../Graphql/product.operations'; // Import your product mutation
 
 export default function CreateProductModalScreen() {
   const router = useRouter();
@@ -22,7 +22,7 @@ export default function CreateProductModalScreen() {
     price: '',
     instock: '',
     isPublished: true,
-    productImageUrl: '',
+    productImageUrl: 'https://superb-mighty-skylark.ngrok-free.app/photos/product2.jpg',
   });
 
   const handleInputChange = (field: keyof typeof formData, value: string) => {
@@ -32,8 +32,16 @@ export default function CreateProductModalScreen() {
     }));
   };
 
-  const [createProduct, { loading: createProductLoading, error: createProductError }] =
-    useMutation(CREATE_PRODUCT);
+  const [createProduct, { loading: createProductLoading, error: createProductError }] = useMutation(
+    CREATE_PRODUCT,
+    {
+      refetchQueries: [
+        {
+          query: GET_ALL_PRODUCTS,
+        },
+      ],
+    }
+  );
 
   const {
     loading: getUserLoading,

@@ -42,6 +42,39 @@ export const GET_USER = gql`
         createdAt
         updatedAt
       }
+      cart {
+        id
+        userId
+        productId
+        quantity
+        productImageUrl
+        price
+        createdAt
+        updatedAt
+        product {
+          title
+          price
+        }
+        user {
+          firstName
+          lastName
+        }
+      }
+      notifications {
+        id
+        title
+        description
+        createdAt
+      }
+      orders {
+        id
+        status
+        createdAt
+        updatedAt
+        products {
+          title
+        }
+      }
       createdAt
       updatedAt
     }
@@ -72,6 +105,39 @@ export const LOGIN_USER = gql`
         productImageUrl
         createdAt
         updatedAt
+      }
+      cart {
+        id
+        userId
+        productId
+        quantity
+        productImageUrl
+        price
+        createdAt
+        updatedAt
+        product {
+          title
+          price
+        }
+        user {
+          firstName
+          lastName
+        }
+      }
+      notifications {
+        id
+        title
+        description
+        createdAt
+      }
+      orders {
+        id
+        status
+        createdAt
+        updatedAt
+        products {
+          title
+        }
       }
       createdAt
       updatedAt
@@ -121,6 +187,27 @@ export const UPDATE_USER = gql`
         productImageUrl
         createdAt
         updatedAt
+      }
+      cart {
+        id
+        quantity
+        createdAt
+        updatedAt
+      }
+      notifications {
+        id
+        title
+        description
+        createdAt
+      }
+      orders {
+        id
+        status
+        createdAt
+        updatedAt
+        products {
+          title
+        }
       }
       createdAt
       updatedAt

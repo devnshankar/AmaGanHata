@@ -87,7 +87,7 @@ const MyProductsTabScreen = () => {
             </Button>
           </View>
           <ScrollView overScrollMode="never" $sm={{ flex: 1, flexDirection: 'column' }}>
-            <YStack $sm={{ padding: 15 }}>
+            <YStack $sm={{ padding: 10 }}>
               {(products || [])
                 .slice()
                 .reverse()

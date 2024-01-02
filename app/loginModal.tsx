@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { Button, Input, Spinner, Text, View } from 'tamagui';
 
 import { LOGIN_USER } from '../Graphql/user.operations';
-import { useLoginStore, useProductStore } from '../zustand/store';
+import { useLoginStore, useOrderItemStore, useProductStore } from '../zustand/store';
 
 
 const LoginForm = ({ onSubmit, isLoading }: any) => {
@@ -95,9 +95,10 @@ const LoginForm = ({ onSubmit, isLoading }: any) => {
 // Main LoginModal component
 export default function LoginModalScreen() {
   const router = useRouter();
-  const { setUser } = useLoginStore();
-  const { setProducts } = useProductStore();
+  const { user, setUser } = useLoginStore();
+  const { products, setProducts } = useProductStore();
   const [isLoading, setIsLoading] = useState(false);
+  const { setOrderItems } = useOrderItemStore();
   const [loginUser, { loading: loginUserLoading, error: loginError }] = useMutation(LOGIN_USER);
 
   function validateEmail(email: any) {
@@ -121,6 +122,9 @@ export default function LoginModalScreen() {
             setUser(loginUserData.loginUser);
             console.log(loginUserData.loginUser.profileImageUrl)
             setProducts(loginUserData.loginUser.products);
+            setOrderItems(loginUserData.loginUser.cart);
+            console.log('UserStore', JSON.stringify(loginUserData.loginUser, null, 2));
+            console.log('ProductStore', JSON.stringify(loginUserData.loginUser.products, null, 2));
             Toast.show({
               type: 'success',
               text1: 'Login Successful',

@@ -3,15 +3,7 @@ import { useRouter } from 'expo-router';
 import { Base64 } from 'js-base64';
 import React from 'react';
 import { StyleSheet, useColorScheme, ActivityIndicator, Image } from 'react-native';
-import {
-  Avatar,
-  ListItem,
-  ScrollView,
-  Separator,
-  Text,
-  View,
-  YGroup,
-} from 'tamagui';
+import { Avatar, ListItem, ScrollView, Separator, Text, View, YGroup } from 'tamagui';
 
 import { useLoginStore } from './../../../zustand/store';
 
@@ -42,11 +34,6 @@ export default function ProfileScreen() {
   const handleEditButton = () => {
     router.push('/editProfileModal');
   };
-  // const theme = useColorScheme();
-  // const buttonTheme: any = () => {
-  //   if (theme === 'dark') return 'white';
-  //   else return 'red';
-  // };
 
   React.useEffect(() => {
     // Set loading to true when starting to fetch data
@@ -98,7 +85,7 @@ export default function ProfileScreen() {
               />
             </View>
           </View>
-          <View $sm={{ margin: 16 }}>
+          <View $sm={{ padding: 10 }}>
             <YGroup
               alignSelf="center"
               bordered

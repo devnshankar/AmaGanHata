@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from '@apollo/client';
 import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { CREATE_ORDERITEM, GET_ALL_ORDERITEMS } from 'Graphql/orderItem.operations';
 import { GET_ALL_PRODUCTS } from 'Graphql/product.operations';
 import { LOGIN_USER } from 'Graphql/user.operations';
 import { useRouter } from 'expo-router';
@@ -29,85 +30,12 @@ import {
   XStack,
   YGroup,
 } from 'tamagui';
-import { useLoginStore, useProductStore } from 'zustand/store';
-
-// let products: any = [
-//   {
-//     id: 1,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Tomatoes',
-//     price: 19.99,
-//     quantity: 2,
-//     Buyer: 'John Doe',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 2,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Apples',
-//     price: 29.99,
-//     quantity: 1,
-//     Buyer: 'Jane Smith',
-//     paymentStatus: 'Pending',
-//   },
-//   {
-//     id: 3,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Jackfruits',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 4,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Mushrooms',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 5,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Carrots',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 6,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Pencils',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 7,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Lamps',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   {
-//     id: 8,
-//     productImageUrl: require('../../assets/images/product1.jpg'),
-//     title: 'Curtains',
-//     price: 39.99,
-//     quantity: 3,
-//     Buyer: 'Bob Johnson',
-//     paymentStatus: 'Paid',
-//   },
-//   // Add more products as needed
-// ];
-
-let products: any;
+import {
+  useFetchedProductStore,
+  useLoginStore,
+  useOrderItemStore,
+  useProductStore,
+} from 'zustand/store';
 
 async function GetToken() {
   try {
@@ -121,21 +49,31 @@ async function GetToken() {
 
 export default function HomeTabScreen() {
   // const [canLogin, setCanLogin] = useState(false)
-  const theme = useColorScheme();
   const [loading, setLoading] = useState(false);
-  const { setUser } = useLoginStore();
+  const { user, setUser, setShowLogin } = useLoginStore();
   const { setProducts } = useProductStore();
+  const { setOrderItems, addOrderItem } = useOrderItemStore();
+  const { fetchedProducts, setFetchedProducts } = useFetchedProductStore();
+  const colorScheme = useColorScheme();
   const router = useRouter();
   const [loginUser, { loading: loginUserLoading, error: loginError }] = useMutation(LOGIN_USER);
-  // const [getAllProducts, { loading: getAllProductsLoading, error: getAllProductsError }] =
-  //   useQuery(GET_ALL_PRODUCTS);
+  const [createOrderItem, { loading: createOrderItemLoading, error: createOrderItemError }] =
+    useMutation(CREATE_ORDERITEM, {
+      refetchQueries: [
+        {
+          query: GET_ALL_ORDERITEMS,
+        },
+      ],
+    });
+
   const {
     loading: getAllProductsLoading,
-    error: getAllProductsrError,
+    error: getAllProductsError,
     data: getAllProductsData,
     refetch: refetchProducts,
   } = useQuery(GET_ALL_PRODUCTS);
 
+  // LOGIN USER HANDLER
   const LoginUser = async () => {
     const email = await SecureStore.getItemAsync('email').catch((error) => {
       console.error('Error getting email from SecureStore:', error);
@@ -156,7 +94,9 @@ export default function HomeTabScreen() {
           // await SecureStore.setItemAsync('Products', loginUserData.loginUser.products);
           setUser(loginUserData.loginUser);
           setProducts(loginUserData.loginUser.products);
-          ToastAndroid.show('Logged in Successfully !!!', ToastAndroid.BOTTOM);
+          setOrderItems(loginUserData.loginUser.cart);
+          console.log(JSON.stringify(loginUserData.loginUser, null, 2));
+          ToastAndroid.show('Login Successful', ToastAndroid.BOTTOM);
         }
       } catch (error: any) {
         ToastAndroid.show('Error Logging in !!!', ToastAndroid.BOTTOM);
@@ -167,21 +107,38 @@ export default function HomeTabScreen() {
     }
   };
 
-  const handleBuy = (product: any) => {
-    console.log(`Buy pressed for ${product.title}`);
+  // ADD PRODUCT HANDLER
+  const AddToCart = async (product: any) => {
+    try {
+      const { data: createOrderItemData } = await createOrderItem({
+        variables: {
+          userId: user?.id,
+          productId: product?.id,
+          //WARNING FOR NOW THE QUANTITY IS 4 MAKE IT DYNAMIC LATER
+          quantity: 4,
+          productImageUrl: product?.productImageUrl,
+          price: product?.price,
+        },
+      });
+      addOrderItem(createOrderItemData?.createOrderItem);
+      ToastAndroid.show('Product added to cart !!!', ToastAndroid.BOTTOM);
+    } catch (error: any) {
+      ToastAndroid.show('Error Adding product to cart !!!', ToastAndroid.BOTTOM);
+      console.log('Error while adding product to cart\n', error);
+    }
   };
 
-  const handleAdd = (product: any) => {
-    console.log(`Add pressed for ${product.title}`);
+  const handleBuy = (product: any) => {
+    console.log(`Buy pressed for ${product.title}`);
+    console.log(JSON.stringify(fetchedProducts, null, 2));
   };
 
   const handleLike = (product: any) => {
     console.log(`Like pressed for ${product.title}`);
   };
 
-  const refetchButtonHandler = async() => {
+  const refetchButtonHandler = async () => {
     try {
-      await refetchProducts();
       await refetchProducts();
       await new Promise<void>((resolve) => {
         const checkLoading = () => {
@@ -195,14 +152,13 @@ export default function HomeTabScreen() {
       });
 
       // Now getAllProductsLoading is false, update the products
-      products = getAllProductsData?.getAllProducts;
-      console.log(JSON.stringify(products, null, 2))
+      setFetchedProducts(getAllProductsData?.getAllProducts);
       ToastAndroid.show('refetch successful!!!', ToastAndroid.BOTTOM);
     } catch (error) {
       console.log(error);
       ToastAndroid.show('Error fetching Products, Try again !!!', ToastAndroid.BOTTOM);
     }
-  }
+  };
   // Function to chunk the array into rows
   const chunkArray = (array: any, size: any) => {
     return array?.reduce(
@@ -212,62 +168,65 @@ export default function HomeTabScreen() {
   };
 
   // Chunk products array into rows of 2
-  const productRows = chunkArray(products, 2);
+  const productRows = chunkArray(fetchedProducts, 2);
 
-  React.useEffect(() => {
-    const FetchData = async () => {
-      try {
-        const token = await GetToken();
-        if (token !== null) {
-          const nullToken: any = { _h: 0, _i: 0, _j: null, _k: null };
+  const FetchData = async () => {
+    try {
+      const token = await GetToken();
+      if (token !== null) {
+        const nullToken: any = { _h: 0, _i: 0, _j: null, _k: null };
 
-          const propertiesMatch = Object.keys(nullToken).every(
-            (key: any) => nullToken[key] === token[key]
-          );
+        const propertiesMatch = Object.keys(nullToken).every(
+          (key: any) => nullToken[key] === token[key]
+        );
 
-          if (propertiesMatch) {
-            router.push('/loginModal');
-          } else {
-            //WARNING Uncomment this after you're done with the frontend part
-            await LoginUser();
-            setLoading(false);
-          }
-        } else {
+        if (propertiesMatch) {
           router.push('/loginModal');
+        } else {
+          //WARNING Uncomment this after you're done with the frontend part
+          await LoginUser();
           setLoading(false);
         }
-      } catch (error) {
-        console.error('Error fetching data:', error);
+      } else {
+        router.push('/loginModal');
+
         setLoading(false);
       }
-    };
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      setLoading(false);
+    }
+  };
+  const FetchProductData = async () => {
+    try {
+      await refetchProducts();
+      await new Promise<void>((resolve) => {
+        const checkLoading = () => {
+          if (!getAllProductsLoading) {
+            resolve();
+          } else {
+            setTimeout(checkLoading, 100);
+          }
+        };
+        checkLoading();
+      });
 
-    const FetchProductData = async () => {
-      try {
-        await refetchProducts();
-        await new Promise<void>((resolve) => {
-          const checkLoading = () => {
-            if (!getAllProductsLoading) {
-              resolve();
-            } else {
-              setTimeout(checkLoading, 100); // Check again after 100 milliseconds
-            }
-          };
-          checkLoading();
-        });
-
-        // Now getAllProductsLoading is false, update the products
-        products = getAllProductsData?.getAllProducts;
-        
-      } catch (error) {
-        console.log(error)
-        ToastAndroid.show('Error fetching Products, Try again !!!', ToastAndroid.BOTTOM);
-      }
-    };
+      setFetchedProducts(getAllProductsData?.getAllProducts);
+    } catch (error) {
+      console.log(error);
+      ToastAndroid.show('Error fetching Products, Try again !!!', ToastAndroid.BOTTOM);
+    }
+  };
+  React.useEffect(() => {
     setLoading(true);
     FetchData();
     FetchProductData();
-  }, [getAllProductsLoading]); // Empty dependency array ensures the effect runs only once after the initial render
+    setTimeout(function () {
+      setShowLogin(true);
+    }, 2000);
+    setLoading(false);
+  }, [loading, getAllProductsLoading]);
+
   return (
     <>
       {loading ? (
@@ -282,18 +241,16 @@ export default function HomeTabScreen() {
         <>
           <XStack>
             <ScrollView>
-              <Button backgroundColor={'green'} onPress={refetchButtonHandler}>
+              {loginUserLoading ? (
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                  <ActivityIndicator style={{ alignSelf: 'center' }} size="large" color="green" />
+                  {/* <Text color="white">{num}</Text> */}
+                </View>
+              ) : null}
+              <Button backgroundColor="green" onPress={refetchButtonHandler}>
                 Refetch
               </Button>
-              <YGroup
-                alignSelf="center"
-                padding={10}
-                width="100%"
-                size="$5"
-                flexDirection="column"
-                // borderRightWidth={1.4}
-
-                borderColor="$tabItemBorderColor">
+              <YGroup alignSelf="center" padding={10} width="100%" size="$5" flexDirection="column">
                 <YGroup.Item>
                   {productRows?.map((row: any, rowIndex: any) => (
                     <XStack
@@ -306,6 +263,10 @@ export default function HomeTabScreen() {
                             console.log(product);
                           }}
                           elevation={15}
+                          borderWidth={0.7}
+                          borderTopWidth={1.1}
+                          borderRightWidth={1.2}
+                          borderColor={colorScheme === 'dark' ? '#3a3a3a' : 'transparent'}
                           $sm={{
                             backgroundColor: '$listItemBackgroundColor',
                             width: '49%', // Adjust width for spacing
@@ -331,11 +292,7 @@ export default function HomeTabScreen() {
                                 }}>
                                 <Image
                                   borderRadius={10}
-                                  source={
-                                    product.productImageUrl
-                                      ? product.productImageUrl
-                                      : require('../../assets/images/product1.jpg')
-                                  }
+                                  source={{ uri: product.productImageUrl }}
                                   style={{ width: 180, height: 230 }}
                                 />
                               </View>
@@ -362,7 +319,7 @@ export default function HomeTabScreen() {
                               <Text color="$background">Buy</Text>
                             </Button>
                             <Button
-                              onPress={() => handleAdd(product)}
+                              onPress={() => AddToCart(product)}
                               color="white"
                               backgroundColor="$yellow8Dark"
                               marginTop={5}

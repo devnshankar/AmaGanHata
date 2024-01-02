@@ -54,7 +54,7 @@ const config = createTamagui({
       borderColorTab: '#185c3e',
       listItemPressColor: '#185c3e',
       listItemDangerPressColor: 'darkred',
-      listItemBackgroundColor: '#121212',
+      listItemBackgroundColor: '#202020',
       borderColorFocus: 'green',
     },
     light: {

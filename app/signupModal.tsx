@@ -8,7 +8,7 @@ import Toast from 'react-native-toast-message';
 import { Button, Input, Text, View, Spinner } from 'tamagui';
 
 import { CREATE_USER, LOGIN_USER } from '../Graphql/user.operations';
-import { useLoginStore, useProductStore } from '../zustand/store';
+import { useLoginStore, useOrderItemStore, useProductStore } from '../zustand/store';
 
 // SignupForm component
 const SignupForm = ({ onSubmit, isLoading }: any) => {
@@ -112,6 +112,7 @@ export default function LoginModalScreen() {
   const router = useRouter();
   const { setUser } = useLoginStore();
   const { setProducts } = useProductStore();
+  const { setOrderItems } = useOrderItemStore();
 
   const [loginUser, { loading: loginUserLoading, error: loginError }] = useMutation(LOGIN_USER);
 
@@ -139,6 +140,7 @@ export default function LoginModalScreen() {
           // await SecureStore.setItemAsync('Products', loginUserData.loginUser.products);
           setUser(loginUserData.loginUser);
           setProducts(loginUserData.loginUser.products);
+          setOrderItems(loginUserData.loginUser.cart);
           Toast.show({
             type: 'success',
             text1: 'Login Successful',

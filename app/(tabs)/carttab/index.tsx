@@ -1,7 +1,10 @@
+import { useMutation } from '@apollo/client';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { DELETE_ORDERITEM } from 'Graphql/orderItem.operations';
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, useColorScheme, StyleSheet, ActivityIndicator } from 'react-native';
+import { Image, useColorScheme, StyleSheet, ActivityIndicator, ToastAndroid } from 'react-native';
+import Toast from 'react-native-toast-message';
 import {
   YStack,
   Text,
@@ -13,87 +16,44 @@ import {
   Button,
   Separator,
 } from 'tamagui';
-
-const products = [
-  {
-    id: 1,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 1',
-    totalPrice: 19.99,
-    quantity: 2,
-    Buyer: 'John Doe',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 2,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 2',
-    totalPrice: 29.99,
-    quantity: 1,
-    Buyer: 'Jane Smith',
-    paymentStatus: 'Pending',
-  },
-  {
-    id: 3,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 3',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 4,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 4',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 5,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 5',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 6,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 6',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 7,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 7',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  {
-    id: 8,
-    image: require('../../../assets/images/product1.jpg'),
-    productName: 'Product 8',
-    totalPrice: 39.99,
-    quantity: 3,
-    Buyer: 'Bob Johnson',
-    paymentStatus: 'Paid',
-  },
-  // Add more products as needed
-];
+import { useOrderItemStore } from 'zustand/store';
 
 const CartTabScreen = () => {
   const colorScheme = useColorScheme();
   const [loading, setLoading] = React.useState(true);
   const router = useRouter();
+  const { orderItems, setOrderItems } = useOrderItemStore();
+
+  const [deleteOrderItem, { loading: deleteOrderItemLoading, error: deleteOrderItemError }] =
+    useMutation(DELETE_ORDERITEM);
+
+  const HandleDeleteOrderItem = async (orderItemId: any) => {
+    try {
+      // Call the createProduct mutation
+      const { data: deletedOrderItemData } = await deleteOrderItem({
+        variables: {
+          deleteOrderItemId: orderItemId,
+        },
+      });
+
+      console.log(JSON.stringify(deletedOrderItemData, null, 2));
+      const orderItemIdToDelete = orderItemId; // Replace 'yourUniqueId' with the actual ID you want to delete
+
+      Toast.show({
+        type: 'success',
+        text1: `Product removed from cart`,
+        text2: 'Product removed successfully !!!',
+      });
+      const updatedProducts = orderItems.filter(
+        (orderItem) => orderItem.id !== orderItemIdToDelete
+      );
+      setOrderItems(updatedProducts);
+    } catch (error) {
+      ToastAndroid.show('Error removing product !!!', ToastAndroid.BOTTOM);
+      console.error('Error creating product:', error);
+    }
+  };
+
   React.useEffect(() => {
     // Set loading to true when starting to fetch data
     setLoading(true);
@@ -116,14 +76,16 @@ const CartTabScreen = () => {
         </View>
       ) : (
         <>
-          <View $sm={{ padding: 16 , paddingBottom:0}}>
+          <View $sm={{ padding: 10, paddingBottom: 10 }}>
             <YGroup
               alignSelf="center"
-              bordered
               width="100%"
               size="$5"
               elevation={10}
-              borderColor={colorScheme === 'dark' ? '$green7Dark' : 'white'}
+              borderWidth={0.7}
+              borderTopWidth={1.1}
+              borderRightWidth={1.2}
+              borderColor={colorScheme === 'dark' ? '#3a3a3a' : 'transparent'}
               separator={
                 <Separator borderColor={colorScheme === 'dark' ? '$green7Dark' : '$gray5Light'} />
               }>
@@ -145,21 +107,23 @@ const CartTabScreen = () => {
             </YGroup>
           </View>
           <ScrollView overScrollMode="never" $sm={{ flex: 1, flexDirection: 'column' }}>
-            <YStack $sm={{ padding: 15 }}>
-              {products.map((product) => (
+            <YStack $sm={{ padding: 10 }}>
+              {orderItems.map((orderItem) => (
                 <ListItemDemo2
-                  key={product.id}
-                  productImage={product.image}
-                  productName={product.productName}
-                  productPrice={product.totalPrice}
-                  productQuantity={product.quantity}
-                  buyerName={product.Buyer}
-                  paymentStatus={product.paymentStatus}
+                  key={orderItem?.id}
+                  orderItemId={orderItem?.id}
+                  orderItemImage={orderItem?.productImageUrl || 'null'}
+                  orderItemName={'product'}
+                  orderItemPrice={orderItem?.totalPrice || 55}
+                  orderItemQuantity={orderItem?.quantity}
+                  buyerName={orderItem?.Buyer || 'buyer'}
+                  paymentStatus={orderItem?.paymentStatus || 'pending'}
+                  HandleDeleteOrderItem={HandleDeleteOrderItem}
                 />
               ))}
             </YStack>
           </ScrollView>
-          <View $sm={{ padding: 10, paddingRight: 15, paddingLeft: 15 }}>
+          <View $sm={{ padding: 10 }}>
             <Button
               pressStyle={{ backgroundColor: '$green8Dark' }}
               backgroundColor="$green9Dark"
@@ -176,36 +140,44 @@ const CartTabScreen = () => {
 export default CartTabScreen;
 
 function ListItemDemo2({
-  productImage,
-  productName,
-  productPrice,
-  productQuantity,
+  orderItemId,
+  orderItemImage,
+  orderItemName,
+  orderItemPrice,
+  orderItemQuantity,
   buyerName,
   paymentStatus,
+  HandleDeleteOrderItem,
 }: any) {
   const colorScheme = useColorScheme();
   return (
     <XStack $sm={{ marginBottom: 10 }}>
       <YGroup
         alignSelf="center"
-        bordered
         width="100%"
         size="$5"
-        borderRightWidth={1.4}
-        borderColor="$tabItemBorderColor">
+        borderWidth={0.7}
+        borderTopWidth={1.1}
+        borderRightWidth={1.2}
+        borderColor={colorScheme === 'dark' ? '#3a3a3a' : 'transparent'}>
         <YGroup.Item>
           <ListItem
-            borderWidth={0.5}
+            // borderWidth={0.5}
             onPress={() => {
-              console.log(productName);
+              console.log(orderItemName);
             }}
-            elevation={15}
-            $sm={{ backgroundColor: '$listItemBackgroundColor' }}
+            // elevation={15}
+            $sm={{
+              backgroundColor: '$listItemBackgroundColor',
+              elevation: 15,
+              size: '$4',
+              padding: 7,
+            }}
             pressStyle={{ backgroundColor: '$listItemPressColor' }}
-            title={productName}
+            title={orderItemName}
             subTitle={
               <View $sm={{ flex: 1, flexDirection: 'column', justifyContent: 'space-between' }}>
-                <Text color="gray">Quantity: {productQuantity}</Text>
+                <Text color="gray">Quantity: {orderItemQuantity}</Text>
                 <Text color="gray">Buyer: {buyerName}</Text>
                 <Text color="gray">Status: {paymentStatus}</Text>
               </View>
@@ -213,28 +185,24 @@ function ListItemDemo2({
             iconAfter={() => (
               <XStack>
                 <Text color="gray" $sm={styles.productPrice}>
-                  ${productPrice.toFixed(2)}
+                  ${orderItemPrice.toFixed(2)}
                 </Text>
               </XStack>
             )}
             icon={
               <Image
                 borderRadius={5}
-                source={
-                  productImage ? productImage : require('../../../assets/images/product1.jpg')
-                }
+                source={{ uri: orderItemImage }}
                 style={{ width: 130, height: 130 }}
               />
-            }
-            size="$4"
-            padding={7}
-            backgroundColor="$listItemBackground">
+            }>
             <XStack $sm={{ flex: 1, flexDirection: 'row' }}>
               <Button size="$3" marginRight={10} marginTop={5} backgroundColor="$green10Dark">
                 <Text color="$background">Buy Now</Text>
               </Button>
               <Button
                 backgroundColor="$red8Dark"
+                onPress={() => {HandleDeleteOrderItem(orderItemId);}}
                 marginTop={5}
                 size="$3"
                 icon={<FontAwesome5 solid size={19} color="white" name="trash-alt" />}
