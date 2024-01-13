@@ -94,7 +94,7 @@ const SalesTabScreen = () => {
         </View>
       ) : (
         <>
-          <YStack $sm={{ flexDirection: 'column', flex: 1, padding: 16 }}>
+          <YStack $sm={{ flexDirection: 'column', flex: 1, padding: 10 }}>
             <View $sm={{ paddingBottom: 0 }}>
               <YGroup
                 alignSelf="center"
@@ -307,7 +307,7 @@ function ListItemDemo2({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 10,
   },
   loadingContainer: {
     flex: 1,

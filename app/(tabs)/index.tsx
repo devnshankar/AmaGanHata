@@ -1,35 +1,13 @@
 import { useMutation, useQuery } from '@apollo/client';
-import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { CREATE_ORDERITEM, GET_ALL_ORDERITEMS } from 'Graphql/orderItem.operations';
 import { GET_ALL_PRODUCTS } from 'Graphql/product.operations';
 import { LOGIN_USER } from 'Graphql/user.operations';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import React, { useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  ToastAndroid,
-  TouchableOpacity,
-  useColorScheme,
-} from 'react-native';
-import Toast from 'react-native-toast-message';
-import {
-  YStack,
-  H2,
-  Separator,
-  Button,
-  Input,
-  TextArea,
-  ScrollView,
-  Text,
-  Card,
-  View,
-  ListItem,
-  XStack,
-  YGroup,
-} from 'tamagui';
+import React, { useState } from 'react';
+import { ActivityIndicator, Image, ToastAndroid, useColorScheme } from 'react-native';
+import { Button, ScrollView, Text, View, ListItem, XStack, YGroup } from 'tamagui';
 import {
   useFetchedProductStore,
   useLoginStore,
@@ -37,6 +15,7 @@ import {
   useProductStore,
 } from 'zustand/store';
 
+// FUNCTION : Gets the json web token from expo-secure-store
 async function GetToken() {
   try {
     const token = await SecureStore.getItemAsync('token');
@@ -47,13 +26,15 @@ async function GetToken() {
   }
 }
 
+// FUNCTION : The main function
 export default function HomeTabScreen() {
-  // const [canLogin, setCanLogin] = useState(false)
   const [loading, setLoading] = useState(false);
+
   const { user, setUser, setShowLogin } = useLoginStore();
   const { setProducts } = useProductStore();
   const { setOrderItems, addOrderItem } = useOrderItemStore();
   const { fetchedProducts, setFetchedProducts } = useFetchedProductStore();
+
   const colorScheme = useColorScheme();
   const router = useRouter();
   const [loginUser, { loading: loginUserLoading, error: loginError }] = useMutation(LOGIN_USER);
@@ -90,8 +71,6 @@ export default function HomeTabScreen() {
         const token = loginUserData.loginUser?.token;
         if (token) {
           await SecureStore.setItemAsync('token', token);
-          // await SecureStore.setItemAsync('User', loginUserData.loginUser);
-          // await SecureStore.setItemAsync('Products', loginUserData.loginUser.products);
           setUser(loginUserData.loginUser);
           setProducts(loginUserData.loginUser.products);
           setOrderItems(loginUserData.loginUser.cart);

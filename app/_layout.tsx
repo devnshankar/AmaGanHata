@@ -5,19 +5,20 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { SplashScreen, Stack } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import React, { useEffect } from 'react';
+import * as React from 'react';
+import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { TamaguiProvider, Theme } from 'tamagui';
-
-import config from '../tamagui.config';
 import { useLoginStore } from 'zustand/store';
+import config from '../tamagui.config';
 
 if (__DEV__) {
   // Adds messages only in a dev environment
   loadDevMessages();
   loadErrorMessages();
 }
+
 // APOLLO SERVER CONFIGURATION
 const getToken = async () => {
   try {
@@ -29,7 +30,7 @@ const getToken = async () => {
 };
 
 const httpLink = createHttpLink({
-  uri: 'https://superb-mighty-skylark.ngrok-free.app/graphql',
+  uri: process.env.EXPO_PUBLIC_SERVER_URI,
 });
 
 const authLink = setContext(async (_, { headers }) => {
@@ -97,7 +98,7 @@ export default function RootLayout() {
     Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),
     InterBold: require('@tamagui/font-inter/otf/Inter-Bold.otf'),
   });
-  console.log(showLogin)
+  console.log(showLogin);
   useEffect(() => {
     if (loaded && showLogin) {
       SplashScreen.hideAsync();
